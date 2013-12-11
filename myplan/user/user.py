@@ -10,7 +10,7 @@ class User:
     date_joined = models.DateTimeField()
     email = models.EmailField()
     password = models.CharField(max_length=100)
-    sex = 
+    sex =
     def __init__(self):
         pass
 
