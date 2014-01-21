@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gaphor xmlns="http://gaphor.sourceforge.net/model" version="3.0" gaphor-version="0.17.2">
+<Package id="99c621a6-6330-11e3-8a9e-08002717a6a7">
+<name>
+<val>New model</val>
+</name>
+<ownedClassifier>
+<reflist>
+<ref refid="a6216ea6-6330-11e3-8a9e-08002717a6a7"/>
+</reflist>
+</ownedClassifier>
+<ownedDiagram>
+<reflist>
+<ref refid="99c65694-6330-11e3-8a9e-08002717a6a7"/>
+</reflist>
+</ownedDiagram>
+</Package>
+<Diagram id="99c65694-6330-11e3-8a9e-08002717a6a7">
+<name>
+<val>main</val>
+</name>
+<package>
+<ref refid="99c621a6-6330-11e3-8a9e-08002717a6a7"/>
+</package>
+<canvas>
+<item type="ClassItem" id="a6220082-6330-11e3-8a9e-08002717a6a7">
+<show-attributes>
+<val>1</val>
+</show-attributes>
+<show-operations>
+<val>1</val>
+</show-operations>
+<drawing-style>
+<val>1</val>
+</drawing-style>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 130.0, 162.0)</val>
+</matrix>
+<width>
+<val>370.0</val>
+</width>
+<height>
+<val>380.0</val>
+</height>
+<subject>
+<ref refid="a6216ea6-6330-11e3-8a9e-08002717a6a7"/>
+</subject>
+<show_stereotypes_attrs>
+<val>0</val>
+</show_stereotypes_attrs>
+</item>
+</canvas>
+</Diagram>
+<Class id="a6216ea6-6330-11e3-8a9e-08002717a6a7">
+<name>
+<val>User</val>
+</name>
+<package>
+<ref refid="99c621a6-6330-11e3-8a9e-08002717a6a7"/>
+</package>
+<presentation>
+<reflist>
+<ref refid="a6220082-6330-11e3-8a9e-08002717a6a7"/>
+</reflist>
+</presentation>
+</Class>
+</gaphor>
