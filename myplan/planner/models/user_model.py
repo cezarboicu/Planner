@@ -2,7 +2,7 @@
 #The user has a certain amount of privileges which can grant him certain rights / features
 
 from django.db import models
-from commons import SEX_TYPE
+from planner.commons import SEX_TYPE
 
 class UserMyPlan(models.Model):
     name = models.CharField(max_length=50)
@@ -13,4 +13,4 @@ class UserMyPlan(models.Model):
     password = models.CharField(max_length=100)
     sex = models.CharField(max_length=1, choices=SEX_TYPE, default='UNDEFINED')
     class Meta:
-        app_lable = 'planner'
+        app_label = 'planner'
