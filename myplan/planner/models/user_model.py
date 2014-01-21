@@ -12,3 +12,5 @@ class UserMyPlan(models.Model):
     email = models.EmailField()
     password = models.CharField(max_length=100)
     sex = models.CharField(max_length=1, choices=SEX_TYPE, default='UNDEFINED')
+    class Meta:
+        app_lable = 'planner'
