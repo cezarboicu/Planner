@@ -4,12 +4,15 @@
 from django.db import models
 from planner.commons import SEX_TYPE
 
+def validate_email(value):
+    pass
+
 class UserMyPlan(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, )
     surname = models.CharField(max_length=50)
     date_of_birth = models.DateField()
     date_joined = models.DateTimeField()
-    email = models.EmailField()
+    email = models.EmailField(validators=[validate_email])
     password = models.CharField(max_length=100)
     sex = models.CharField(max_length=1, choices=SEX_TYPE, default='UNDEFINED')
     class Meta:
