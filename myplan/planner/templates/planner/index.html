@@ -1,5 +1,13 @@
-Welcome to Buget Planner. Please ... try to save your money
+<h2>Welcome to Buget Planner. Please ... try to save your money</h2>
+</br>
+<h3>Use your credential to Login, or Sign Up</h3>
 
-Use your credential to Login, or Sign Up
-
+<form action="{% url planner:login_planner %}" method="post">
+{% csrf_token %}
+<label>email:</label>
+<input type="text" />
+<label>password:</label>
+<input type="password" />
+<input type="submit" value="Login">
+</form>
 email:
