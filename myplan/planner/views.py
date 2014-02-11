@@ -1,6 +1,5 @@
-from django.shortcuts import render
-from django.http import HTTPResponse
+from django.http import HttpResponse
 
 
 def index_planner(request):
-    return HTTPResponse('Welcome Please log in or sign up')
+    return HttpResponse('Welcome Please log in or sign up')
