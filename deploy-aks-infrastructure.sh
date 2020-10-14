@@ -439,7 +439,23 @@ if [ -z "$KOTSPW" ]
 fi
 curl -L -o kots_linux_amd64.tar.gz https://github.com/replicatedhq/kots/releases/download/$KOTS_VERSION/kots_linux_amd64.tar.gz
 tar xzf kots_linux_amd64.tar.gz
-./kots install "$KOTS_CHANNEL" --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
+
+wget https://raw.githubusercontent.com/cezarboicu/Planner/master/AzureUnstable.yaml
+wget https://raw.githubusercontent.com/cezarboicu/Planner/master/config.yaml
+
+#First time write to new file just to ensure source of truth is not being change
+sed "s/JWT_TOKEN_VAR/${jwtToken}/g" config.yaml > config-temp.yaml
+#Second edit onwards in-place edit 
+sed -i "s/IDENTITY_ENDPOINT_VAR/${identityEndpoint}/g" config-temp.yaml
+sed -i "s/ORCH_ENDPOINT_VAR/${orchestratorEndpoint}/g" config-temp.yaml
+sed -i "s/INGRESS_ENDPOINT_VAR/${INGRESS_HOST}/g" config-temp.yaml
+sed -i "s/SQL_HOST_VAR/${sqlhost}/g" config-temp.yaml
+sed -i "s/SQL_USER_VAR/${sqlAdministratorLogin}/g" config-temp.yaml
+#Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
+sed -i "s#SQL_PASS_VAR#${sqlAdministratorLoginPassword}#g" config-temp.yaml
+
+
+./kots install app "$KOTS_CHANNEL" --license-file ./AzureUnstable.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
 
 #reset kots password
 echo $KOTSPW | ./kots reset-password -n $NAMESPACE
