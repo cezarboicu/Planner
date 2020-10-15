@@ -430,54 +430,11 @@ fi
 kubectl apply -f default-storageclass.yaml
 #validating Existence of default storageClass
 validateStorageClass
-# install kots admin
-KOTS_VERSION=v1.19.4
-KOTSPW=$kotsAdminPassword   
-if [ -z "$KOTSPW" ] 
-  then  
-    KOTSPW=$(openssl rand -hex 10)  
-fi
-curl -L -o kots_linux_amd64.tar.gz https://github.com/replicatedhq/kots/releases/download/$KOTS_VERSION/kots_linux_amd64.tar.gz
-tar xzf kots_linux_amd64.tar.gz
 
-wget https://raw.githubusercontent.com/cezarboicu/Planner/master/AzureUnstable.yaml
-wget https://raw.githubusercontent.com/cezarboicu/Planner/master/config.yaml
-
-#First time write to new file just to ensure source of truth is not being change
-sed "s/JWT_TOKEN_VAR/${jwtToken}/g" config.yaml > config-temp.yaml
-#Second edit onwards in-place edit 
-sed -i "s/IDENTITY_ENDPOINT_VAR/${identityEndpoint}/g" config-temp.yaml
-sed -i "s/ORCH_ENDPOINT_VAR/${orchestratorEndpoint}/g" config-temp.yaml
-sed -i "s/INGRESS_ENDPOINT_VAR/${INGRESS_HOST}/g" config-temp.yaml
-sed -i "s/SQL_HOST_VAR/${sqlhost}/g" config-temp.yaml
-sed -i "s/SQL_USER_VAR/${sqlAdministratorLogin}/g" config-temp.yaml
-#Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
-sed -i "s#SQL_PASS_VAR#${sqlAdministratorLoginPassword}#g" config-temp.yaml
-
-
-./kots install app "$KOTS_CHANNEL" --license-file ./AzureUnstable.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
-
-#reset kots password
-echo $KOTSPW | ./kots reset-password -n $NAMESPACE
-
-#Check kotsAdmin Deploy Status
-kubectl -n $NAMESPACE rollout status deployment/kotsadm --watch=true
-validate kotsadm aifabric
-
-kubectl -n $NAMESPACE rollout status deployment/kotsadm-operator --watch=true
-validate kotsadm-operator aifabric
 
 #https://kubernetes.io/blog/2018/10/11/topology-aware-volume-provisioning-in-kubernetes/ 
 kubectl apply -f topology-aware-volumes.yaml
 validateAndPrint "storage class creation failed"
-
-
-if [ "${expose_kots}" = "true" ];
-then
-#patch kots to be a loadbalancer service
-echo "Exposing KOTS via PublicIP/LoadBalancer (-E switch) is Enabled"
-kubectl patch service kotsadm -p '{"spec":{"type":"LoadBalancer"}}' --namespace $NAMESPACE
-fi
 
 
 #install nvidia daemonset for GPU
@@ -698,6 +655,52 @@ validateAndPrint "Error creating certificate"
 sleep 10
 #Validate Cert Creation Status
 validateCertificateStatus
+
+####--------------------------------------------- Start KOTS Installation ---------------------------------------------------#####
+# install kots admin
+KOTS_VERSION=v1.19.4
+KOTSPW=$kotsAdminPassword   
+if [ -z "$KOTSPW" ] 
+  then  
+    KOTSPW=$(openssl rand -hex 10)  
+fi
+
+curl -L -o kots_linux_amd64.tar.gz https://github.com/replicatedhq/kots/releases/download/$KOTS_VERSION/kots_linux_amd64.tar.gz
+tar xzf kots_linux_amd64.tar.gz
+
+wget -O AzureUnstable.yaml https://raw.githubusercontent.com/cezarboicu/Planner/master/AzureUnstable.yaml
+wget -O config.yaml https://raw.githubusercontent.com/cezarboicu/Planner/master/config.yaml
+
+#First time write to new file just to ensure source of truth is not being change
+sed "s/JWT_TOKEN_VAR/${jwtToken}/g" config.yaml > config-temp.yaml
+#Second edit onwards in-place edit 
+sed -i "s/IDENTITY_ENDPOINT_VAR/${identityEndpoint}/g" config-temp.yaml
+sed -i "s/ORCH_ENDPOINT_VAR/${orchestratorEndpoint}/g" config-temp.yaml
+sed -i "s/INGRESS_ENDPOINT_VAR/${INGRESS_HOST}/g" config-temp.yaml
+sed -i "s/SQL_HOST_VAR/${sqlhost}/g" config-temp.yaml
+sed -i "s/SQL_USER_VAR/${sqlAdministratorLogin}/g" config-temp.yaml
+#Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
+sed -i "s#SQL_PASS_VAR#${sqlAdministratorLoginPassword}#g" config-temp.yaml
+
+./kots install app "$KOTS_CHANNEL" --license-file ./AzureUnstable.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
+
+#reset kots password
+echo $KOTSPW | ./kots reset-password -n $NAMESPACE
+
+#Check kotsAdmin Deploy Status
+kubectl -n $NAMESPACE rollout status deployment/kotsadm --watch=true
+validate kotsadm aifabric
+
+kubectl -n $NAMESPACE rollout status deployment/kotsadm-operator --watch=true
+validate kotsadm-operator aifabric
+
+if [ "${expose_kots}" = "true" ];
+then
+  #patch kots to be a loadbalancer service
+  echo "Exposing KOTS via PublicIP/LoadBalancer (-E switch) is Enabled"
+  kubectl patch service kotsadm -p '{"spec":{"type":"LoadBalancer"}}' --namespace $NAMESPACE
+fi
+####--------------------------------------------- End KOTS Installation ---------------------------------------------------#####
 
 ########-------------------------------------------------- Start Install Velero -----------------------------------------########
 #Download Velero 
