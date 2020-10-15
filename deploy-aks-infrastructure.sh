@@ -668,7 +668,7 @@ fi
 curl -L -o kots_linux_amd64.tar.gz https://github.com/replicatedhq/kots/releases/download/$KOTS_VERSION/kots_linux_amd64.tar.gz
 tar xzf kots_linux_amd64.tar.gz
 
-wget -O AzureUnstable.yaml https://raw.githubusercontent.com/cezarboicu/Planner/master/AzureUnstable.yaml
+wget -O AzureUnstable.yaml ${URL}
 wget -O config.yaml https://raw.githubusercontent.com/cezarboicu/Planner/master/config.yaml
 
 #First time write to new file just to ensure source of truth is not being change
