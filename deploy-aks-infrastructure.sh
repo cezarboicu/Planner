@@ -687,17 +687,17 @@ sed -i "s/SQL_USER_VAR/${sqlAdministratorLogin}/g" config-temp.yaml
 #Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
 sed -i "s#SQL_PASS_VAR#${sqlAdministratorLoginPassword}#g" config-temp.yaml
 
-./kots install app "$KOTS_CHANNEL" --license-file ./licenseFile.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
+#./kots install app "$KOTS_CHANNEL" --license-file ./licenseFile.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
 
 #reset kots password
-echo $KOTSPW | ./kots reset-password -n $NAMESPACE
+#echo $KOTSPW | ./kots reset-password -n $NAMESPACE
 
 #Check kotsAdmin Deploy Status
-kubectl -n $NAMESPACE rollout status deployment/kotsadm --watch=true
-validate kotsadm aifabric
+#kubectl -n $NAMESPACE rollout status deployment/kotsadm --watch=true
+#validate kotsadm aifabric
 
-kubectl -n $NAMESPACE rollout status deployment/kotsadm-operator --watch=true
-validate kotsadm-operator aifabric
+#kubectl -n $NAMESPACE rollout status deployment/kotsadm-operator --watch=true
+#validate kotsadm-operator aifabric
 
 if [ "${expose_kots}" = "true" ];
 then
