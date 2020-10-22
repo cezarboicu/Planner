@@ -749,6 +749,9 @@ echo "Preparing outputs for upload in blob storage account $storageAccountName1 
 
 echo "----ARM Outputs----" >> consoleOutputs.txt
 
+echo "LICENSE IS !!!" >> consoleOutputs.txt
+echo $licenseField >> consoleOutputs.txt
+
 for key in ${constants}; do
  echo $key >> consoleOutputs.txt
 done
