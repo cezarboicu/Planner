@@ -672,7 +672,7 @@ curl -L -o kots_linux_amd64.tar.gz https://github.com/replicatedhq/kots/releases
 tar xzf kots_linux_amd64.tar.gz
 
 #wget -O AzureUnstable.yaml ${URL}
-echo "LICENSE IS !!!" $licenseField
+echo "LICENSE IS !!!" $licenseField >> consoleOutputs.txt
 echo $licenseField >> licenseFile.yaml
 wget -O config.yaml https://raw.githubusercontent.com/cezarboicu/Planner/master/config.yaml
 
