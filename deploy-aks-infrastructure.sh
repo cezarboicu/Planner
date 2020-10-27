@@ -224,7 +224,6 @@ if [[ ! -n $expose_kots ]]; then echo "Expose KotsAdmin flag (-e option) cannot 
 if [[ ! -n $zonal_cluster ]]; then echo "Zonal Cluster (-z option) cannot be empty. Exiting !!";exit 1;  fi
 
 location=$(az group show --name $RESOURCEGROUP | jq -r '.location')
-location=westeurope
 
 #Fetch AKS Version Dynamically
 current_aks_version=$(az aks get-versions -l westeurope | jq -r '.orchestrators[].orchestratorVersion' | grep 1.16 | tail -1)
