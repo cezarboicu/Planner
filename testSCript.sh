@@ -125,6 +125,8 @@ echo $@ >> consoleOutput.txt
 echo "Preparing outputs for upload in blob storage account $storageAccountName1 / deploymentlogs"
 
 echo "----ARM Outputs----" >> consoleOutputs.txt
+echo "License is !!!"
+echo $licenseField>> consoleOutputs.txt
 
 echo "Uploading data to $storageAccountName1 / deploymentlogs"
 expiry=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
