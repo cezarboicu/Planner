@@ -225,41 +225,42 @@ if [[ ! -n $zonal_cluster ]]; then echo "Zonal Cluster (-z option) cannot be emp
 
 location=$(az group show --name $RESOURCEGROUP | jq -r '.location')
 
+
 #Fetch AKS Version Dynamically
-current_aks_version=$(az aks get-versions -l westeurope | jq -r '.orchestrators[].orchestratorVersion' | grep 1.16 | tail -1)
+#current_aks_version=$(az aks get-versions -l westeurope | jq -r '.orchestrators[].orchestratorVersion' | grep 1.16 | tail -1)
 #If 1.16 is deprecated then fallback to AKS version which is set as default
-if [ -z "$current_aks_version" ]
-then
-  current_aks_version=$(az aks get-versions -l $location | jq -r '.orchestrators[] | select(.default == true) | .orchestratorVersion')
-fi
+#if [ -z "$current_aks_version" ]
+#then
+#  current_aks_version=$(az aks get-versions -l $location | jq -r '.orchestrators[] | select(.default == true) | .orchestratorVersion')
+#fi
 
-sed "s/AKS_VERSION/$current_aks_version/g" azuredeploy.parameters.json > azuredeploy.parameters-temp.json
-PARAMETERS_FILE="azuredeploy.parameters-temp.json"
-extracted_tags=$(jq -r '.parameters.resourceTags.value' $PARAMETERS_FILE)
+#sed "s/AKS_VERSION/$current_aks_version/g" azuredeploy.parameters.json > azuredeploy.parameters-temp.json
+#PARAMETERS_FILE="azuredeploy.parameters-temp.json"
+#extracted_tags=$(jq -r '.parameters.resourceTags.value' $PARAMETERS_FILE)
 
-if [[ ! -n $extracted_tags || "$extracted_tags" == "{}" || "$extracted_tags" == "null" ]];
-then
-  echo "Resource tags cant be empty under $PARAMETERS_FILE file. Exiting !!"
-  exit 1
-fi
+#if [[ ! -n $extracted_tags || "$extracted_tags" == "{}" || "$extracted_tags" == "null" ]];
+#then
+#  echo "Resource tags cant be empty under $PARAMETERS_FILE file. Exiting !!"
+#  exit 1
+#fi
 
 #Check if tags are valid
-empty_key_vals=$(jq -r '.parameters.resourceTags.value | to_entries[] | select(.value == null or .key == null or .value == "" or .key == "")' $PARAMETERS_FILE)
+#empty_key_vals=$(jq -r '.parameters.resourceTags.value | to_entries[] | select(.value == null or .key == null or .value == "" or .key == "")' $PARAMETERS_FILE)
 
 #If there exists keys/values which are null or empty
-if [ ! -z "$empty_key_vals" ]
-then
-  echo "Tags specified under $PARAMETERS_FILE are not of valid format. Exiting !!"
-  exit 1
-fi
+#if [ ! -z "$empty_key_vals" ]
+#then
+#  echo "Tags specified under $PARAMETERS_FILE are not of valid format. Exiting !!"
+#  exit 1
+#fi
 
-db_creation_option=$(jq -r '.parameters.sqlNewOrExisting.value' $PARAMETERS_FILE)
+#db_creation_option=$(jq -r '.parameters.sqlNewOrExisting.value' $PARAMETERS_FILE)
 
-if [ "${db_creation_option}" = "new" ];
-then
-  if [[ ! -n "$SQL_PASSWORD" ]]; then echo "SQL Password(-p option) has to be provided";exit 1; fi
-  if [[ ! -n "$SQL_USERNAME" ]]; then echo "SQL UserName(-s option) has to be provided";exit 1; fi
-fi
+#if [ "${db_creation_option}" = "new" ];
+#then
+#  if [[ ! -n "$SQL_PASSWORD" ]]; then echo "SQL Password(-p option) has to be provided";exit 1; fi
+#  if [[ ! -n "$SQL_USERNAME" ]]; then echo "SQL UserName(-s option) has to be provided";exit 1; fi
+#fi
 
 #Current SignIn User
 sign_in_user=$(az ad signed-in-user show | jq -r '.mail')
@@ -275,8 +276,8 @@ az role assignment list --resource-group $RESOURCEGROUP --out table >> consoleOu
 SUBSCRIPTION_ID=$(az group show --name $RESOURCEGROUP | jq -r '.id' | cut -d'/' -f3)
 az account set --subscription $SUBSCRIPTION_ID
 
-cpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[0].nodeVmSize' $PARAMETERS_FILE)
-gpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[1].nodeVmSize' $PARAMETERS_FILE)
+#cpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[0].nodeVmSize' $PARAMETERS_FILE)
+#gpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[1].nodeVmSize' $PARAMETERS_FILE)
 
 if [ "${zonal_cluster}" = "true" ];
 then
@@ -296,13 +297,15 @@ if [[ ! -n "$gpu_node_availability" ]]; then echo "GPU Node type: $gpu_instance_
 
 if [ "$peering_flag" = true ] ;
 then
-  currentVnetAddressSpace=$(jq -r '.parameters.vnetAddressPrefix.value' $PARAMETERS_FILE)
+#currentVnetAddressSpace - now comes from the maintemplate script as ENVVAR
+#  currentVnetAddressSpace=$(jq -r '.parameters.vnetAddressPrefix.value' $PARAMETERS_FILE)
   targetVnetAddressSpace=$(az network vnet show -g $ORCH_RG -n $ORCH_VNET | jq -r '.addressSpace.addressPrefixes[0]')
 
   validateIPAddressRange $currentVnetAddressSpace
   validateIPAddressRange $targetVnetAddressSpace
 
-  currentSubnetPrefix=$(jq -r '.parameters.subnetPrefix.value' $PARAMETERS_FILE)
+#currentSubnetPrefix - now comes from the maintemplate script as ENVVAR
+#  currentSubnetPrefix=$(jq -r '.parameters.subnetPrefix.value' $PARAMETERS_FILE)
   targetSubnetPrefix=$(az network vnet show -g $ORCH_RG -n $ORCH_VNET | jq -r '.subnets[0].addressPrefix')
 
   echo "CurrentVnetAddressSpace: $currentVnetAddressSpace"
