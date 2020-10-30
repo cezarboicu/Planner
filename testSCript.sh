@@ -370,43 +370,5 @@ az aks nodepool add --name gpunodepool \
     --zones {1,2,3}
 fi; ##
 
-case $peering_flag in
-    true )
-        # AiFabric VNET ID
-        vNet1Id=$(az network vnet show \
-          --resource-group $RESOURCEGROUP \
-          --name $vnetname \
-          --query id --out tsv)
-
-        # Orchestrator VNET ID
-        vNet2Id=$(az network vnet show \
-          --resource-group $ORCH_RG \
-          --name $ORCH_VNET \
-          --query id \
-          --out tsv)
-
-        az network vnet peering create \
-          --name aifabric-orchestrator \
-          --resource-group $RESOURCEGROUP \
-          --vnet-name $vnetname \
-          --remote-vnet $vNet2Id \
-          --allow-vnet-access
-
-        az network vnet peering create \
-          --name orchestrator-aifabric \
-          --resource-group $ORCH_RG \
-          --vnet-name $ORCH_VNET \
-          --remote-vnet $vNet1Id \
-          --allow-vnet-access
-
-        az network vnet peering show \
-          --name aifabric-orchestrator \
-          --resource-group $RESOURCEGROUP \
-          --vnet-name $vnetname \
-          --query peeringState
-        ;;
-    false )
-        echo "Non-Peering deployment" ;;
-esac
 
 #get credentials aks
