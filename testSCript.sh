@@ -354,21 +354,3 @@ else
   sed "s#,AVAIL_ZONES_PLACEHOLDER##g" azuredeploy.json > azuredeploy-temp.json
 fi
 
-#create gpu node pool and apply taints on resource group
-#commented code as we are not creating taints & GPU Node pool using arm
-if [ ]; then ##
-az aks nodepool add --name gpunodepool \
-    --enable-cluster-autoscaler \
-    --resource-group ${RESOURCEGROUP} \
-    --cluster-name ${AKSCLUSTERNAME} \
-    --node-vm-size Standard_NC6s_v2 \
-    --node-taints nvidia.com/gpu=present:NoSchedule \
-    --labels accelerator=nvidia \
-    --node-count 1 \
-    --min-count 1 \
-    --max-count 5
-    --zones {1,2,3}
-fi; ##
-
-
-#get credentials aks
