@@ -275,3 +275,138 @@ az role assignment list --resource-group $RESOURCEGROUP --out table >> consoleOu
 #Set Subscription
 SUBSCRIPTION_ID=$(az group show --name $RESOURCEGROUP | jq -r '.id' | cut -d'/' -f3)
 az account set --subscription $SUBSCRIPTION_ID
+
+#cpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[0].nodeVmSize' $PARAMETERS_FILE)
+#gpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[1].nodeVmSize' $PARAMETERS_FILE)
+
+if [ "${zonal_cluster}" = "true" ];
+then
+  cpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg cpu_instance_type "$cpu_instance_type" '.[] | select(.name==$cpu_instance_type and .locationInfo[0].zones[0] != null) | .name')
+  gpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg gpu_instance_type "$gpu_instance_type" '.[] | select(.name==$gpu_instance_type and .locationInfo[0].zones[0] != null) | .name')
+else
+  cpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg cpu_instance_type "$cpu_instance_type" '.[] | select(.name==$cpu_instance_type) | .name')
+  gpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg gpu_instance_type "$gpu_instance_type" '.[] | select(.name==$gpu_instance_type) | .name')
+fi
+
+echo "you can run the below command to fetch list of instance types available in the current location"
+echo "az vm list-skus --location $location --output table"
+#Check for CPU and GPU Node availability under the location where resource group is created
+if [[ ! -n "$cpu_node_availability" ]]; then echo "CPU Node type: $cpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
+if [[ ! -n "$gpu_node_availability" ]]; then echo "GPU Node type: $gpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
+
+
+if [ "$peering_flag" = true ] ;
+then
+#currentVnetAddressSpace - now comes from the maintemplate script as ENVVAR
+#  currentVnetAddressSpace=$(jq -r '.parameters.vnetAddressPrefix.value' $PARAMETERS_FILE)
+  targetVnetAddressSpace=$(az network vnet show -g $ORCH_RG -n $ORCH_VNET | jq -r '.addressSpace.addressPrefixes[0]')
+
+  validateIPAddressRange $currentVnetAddressSpace
+  validateIPAddressRange $targetVnetAddressSpace
+
+#currentSubnetPrefix - now comes from the maintemplate script as ENVVAR
+#  currentSubnetPrefix=$(jq -r '.parameters.subnetPrefix.value' $PARAMETERS_FILE)
+  targetSubnetPrefix=$(az network vnet show -g $ORCH_RG -n $ORCH_VNET | jq -r '.subnets[0].addressPrefix')
+
+  echo "CurrentVnetAddressSpace: $currentVnetAddressSpace"
+  echo "TargetVnetAddressSpace: $targetVnetAddressSpace"
+  echo "CurrentSubnetPrefix: $currentSubnetPrefix"
+  echo "TargetSubnetPrefix: $targetSubnetPrefix"
+
+  if [ "$currentVnetAddressSpace" = "$targetVnetAddressSpace" ];
+  then
+    echo "Vnet Peering is not possible, the CurrentVnetAddressSpace $currentVnetAddressSpace overlaps with the targetVnetAddressSpace i.e $targetVnetAddressSpace"
+    echo "Please make sure that the AddressSpaces of the vnets are not overlapped, more info: https://docs.microsoft.com/en-us/azure/virtual-network/create-peering-different-subscriptions"
+    exit 1
+  fi
+
+  vnet_peering_name=orchestrator-aifabric
+  echo "-------------------------------------**********************************************************------------------------"
+  echo "If you see an message like orchestrator-aifabric vnet not found, ignore this message, its just a check to see if peering already exists"
+  echo "-------------------------------------**********************************************************------------------------"
+  peering_state=$(az network vnet peering show --name $vnet_peering_name --resource-group $ORCH_RG --vnet-name $ORCH_VNET --query peeringState | sed 's/"//g')
+
+  if [ "$peering_state" = "Disconnected" ]
+  then
+    echo "Vnet Peering from this resource group already exists and peering is in Disconnected state, this usually happens when source Vnet is deleted"
+    echo "Please delete Vnet peering of name $vnet_peering_name from the target Vnet manually TargetResourceGroup->Vnet->VnetPeering->Delete peering with name $vnet_peering_name"
+    exit 1
+  fi
+  
+  if [ "$peering_state" = "Connected" ];
+  then
+    echo "Vnet Peering from this resource group already exists and peering is in Connected state, skipping peering step"
+  fi
+fi
+
+# Not required right now, as we are assuming that a resource group should already exist befor kickstarting the Infra provisioning job
+#az group create -n $RESOURCEGROUP -l $LOCATION --tags "Project=Ai Fabric" "Owner=rajiv.chodisetti@uipath.com"
+#validateAndPrint "Resource Group creation failed"
+
+export WORKER_RESOURECEGROUP="${AKSCLUSTERNAME}-worker"
+
+#using # instead of / , comma is also part of placeholder
+
+if [ "${zonal_cluster}" = "true" ];
+then
+  sed "s#,AVAIL_ZONES_PLACEHOLDER#,\"availabilityZones\": \"[parameters\('agentPoolProfiles'\)[copyIndex\('agentPoolProfiles'\)].availabilityZones]\"#g" azuredeploy.json > azuredeploy-temp.json
+else
+  sed "s#,AVAIL_ZONES_PLACEHOLDER##g" azuredeploy.json > azuredeploy-temp.json
+fi
+
+#create gpu node pool and apply taints on resource group
+#commented code as we are not creating taints & GPU Node pool using arm
+if [ ]; then ##
+az aks nodepool add --name gpunodepool \
+    --enable-cluster-autoscaler \
+    --resource-group ${RESOURCEGROUP} \
+    --cluster-name ${AKSCLUSTERNAME} \
+    --node-vm-size Standard_NC6s_v2 \
+    --node-taints nvidia.com/gpu=present:NoSchedule \
+    --labels accelerator=nvidia \
+    --node-count 1 \
+    --min-count 1 \
+    --max-count 5
+    --zones {1,2,3}
+fi; ##
+
+case $peering_flag in
+    true )
+        # AiFabric VNET ID
+        vNet1Id=$(az network vnet show \
+          --resource-group $RESOURCEGROUP \
+          --name $vnetname \
+          --query id --out tsv)
+
+        # Orchestrator VNET ID
+        vNet2Id=$(az network vnet show \
+          --resource-group $ORCH_RG \
+          --name $ORCH_VNET \
+          --query id \
+          --out tsv)
+
+        az network vnet peering create \
+          --name aifabric-orchestrator \
+          --resource-group $RESOURCEGROUP \
+          --vnet-name $vnetname \
+          --remote-vnet $vNet2Id \
+          --allow-vnet-access
+
+        az network vnet peering create \
+          --name orchestrator-aifabric \
+          --resource-group $ORCH_RG \
+          --vnet-name $ORCH_VNET \
+          --remote-vnet $vNet1Id \
+          --allow-vnet-access
+
+        az network vnet peering show \
+          --name aifabric-orchestrator \
+          --resource-group $RESOURCEGROUP \
+          --vnet-name $vnetname \
+          --query peeringState
+        ;;
+    false )
+        echo "Non-Peering deployment" ;;
+esac
+
+#get credentials aks
