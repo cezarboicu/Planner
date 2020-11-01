@@ -291,8 +291,8 @@ fi
 echo "you can run the below command to fetch list of instance types available in the current location"
 echo "az vm list-skus --location $location --output table"
 #Check for CPU and GPU Node availability under the location where resource group is created
-if [[ ! -n "$cpu_node_availability" ]]; then echo "CPU Node type: $cpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
-if [[ ! -n "$gpu_node_availability" ]]; then echo "GPU Node type: $gpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
+#if [[ ! -n "$cpu_node_availability" ]]; then echo "CPU Node type: $cpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
+#if [[ ! -n "$gpu_node_availability" ]]; then echo "GPU Node type: $gpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
 
 
 if [ "$peering_flag" = true ] ;
