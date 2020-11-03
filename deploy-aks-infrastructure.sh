@@ -676,8 +676,8 @@ curl -L -o kots_linux_amd64.tar.gz https://github.com/replicatedhq/kots/releases
 tar xzf kots_linux_amd64.tar.gz
 
 #wget -O AzureUnstable.yaml ${URL}
-echo "LICENSE IS !!!" $licenseField >> consoleOutputs.txt
-echo $licenseField >> licenseFile.yaml
+echo $licenseField >> licenseFileEncoded.file
+base64 -d licenseFileEncoded.file >> licenseFile.yaml
 wget -O config.yaml https://raw.githubusercontent.com/cezarboicu/Planner/master/config.yaml
 
 #First time write to new file just to ensure source of truth is not being change
