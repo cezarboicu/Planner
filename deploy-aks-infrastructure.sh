@@ -687,9 +687,9 @@ sed -i "s/IDENTITY_ENDPOINT_VAR/${identityEndpoint}/g" config-temp.yaml
 sed -i "s/ORCH_ENDPOINT_VAR/${orchestratorEndpoint}/g" config-temp.yaml
 sed -i "s/INGRESS_ENDPOINT_VAR/${INGRESS_HOST}/g" config-temp.yaml
 sed -i "s/SQL_HOST_VAR/${sqlhost}/g" config-temp.yaml
-sed -i "s/SQL_USER_VAR/${sqlAdministratorLogin}/g" config-temp.yaml
+sed -i "s/SQL_USER_VAR/${SQL_USERNAME}/g" config-temp.yaml
 #Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
-sed -i "s#SQL_PASS_VAR#${sqlAdministratorLoginPassword}#g" config-temp.yaml
+sed -i "s#SQL_PASS_VAR#${SQL_PASSWORD}#g" config-temp.yaml
 
 ./kots install app "$KOTS_CHANNEL" --license-file ./licenseFile.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
 
