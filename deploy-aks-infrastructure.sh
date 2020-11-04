@@ -164,7 +164,7 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       ;;
     e)
       echo "Expose Kots via Public IP/LoadBalancer is $OPTARG"
-      if [ $OPTARG = "yes" ] ;
+      if [ "$OPTARG" = "yes" ] ;
         then      
       	expose_kots="true";
       fi
