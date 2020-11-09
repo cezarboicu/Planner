@@ -163,10 +163,10 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       SQL_PASSWORD=$OPTARG
       ;;
     e)
-      echo "Expose Kots via Public IP/LoadBalancer is $OPTARG"
-      if [ "$OPTARG" = "yes" ] ;
+      echo "Expose Kots via Public IP/LoadBalancer is $OPTARG" | tee -a consoleOutputs.txt
+      if [[ "$OPTARG" == "yes" ]] ;
         then      
-      	expose_kots="true";
+      	expose_kots=true;
       fi
       ;;
     z)
@@ -703,7 +703,7 @@ validate kotsadm aifabric
 kubectl -n $NAMESPACE rollout status deployment/kotsadm-operator --watch=true
 validate kotsadm-operator aifabric
 
-if [ "${expose_kots}" = "true" ];
+if [ "${expose_kots}" = true ];
 then
   #patch kots to be a loadbalancer service
   echo "Exposing KOTS via PublicIP/LoadBalancer (-E switch) is Enabled"
@@ -781,7 +781,7 @@ echo "INGRESS_DOMAIN is: $INGRESS_DOMAIN" | tee -a consoleOutputs.txt
 
 
 #extract kotsAdmin LB IP
-if [ "${expose_kots}" = "true" ];
+if [ "${expose_kots}" = true ];
 then
   #patch kots to be a loadbalancer service
   KOTS_HOST=$(kubectl -n aifabric get svc kotsadm -o json | jq -r ".status.loadBalancer.ingress[0].ip")
