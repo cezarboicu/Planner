@@ -776,10 +776,10 @@ else
   echo "DB Creation is Disabled"  | tee -a consoleOutputs.txt
 fi
 
-echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs
-echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs  
-echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs
-echo "P_PARAM is: $P_PARAM" | tee -a consoleOutputs
+echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs.txt
+echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs.txt  
+echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs.txt
+echo "P_PARAM is: $P_PARAM" | tee -a consoleOutputs.txt
 
 #Ingress Details
 echo "INGRESS_HOST is: $INGRESS_HOST" | tee -a consoleOutputs.txt
