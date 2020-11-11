@@ -163,6 +163,7 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       SQL_PASSWORD=$OPTARG
       ;;
     e)
+      E_PARAM=$OPTARG
       echo "Expose Kots via Public IP/LoadBalancer is $OPTARG" | tee -a consoleOutputs.txt
       if [[ "$OPTARG" == "yes" ]] ;
         then      
@@ -174,11 +175,13 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       zonal_cluster=$OPTARG
       ;;
     O)  
+      O_PARAM=$OPTARG
       echo "VNET Peering Target Resource Group is $OPTARG"  
       ORCH_RG=$OPTARG
       orchestrator_rg=true
       ;; 
     V)  
+      V_PARAM=$OPTARG
       echo "VNET Peering target name is $OPTARG"  
       ORCH_VNET=$OPTARG
       vnet_flag=true
@@ -186,6 +189,7 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
     P)  
       echo "VNET Peering is enabled"  
       peering_flag=true
+      P_PARAM="peer is enabled"
       ;;   
     \?)  
       echo "Invalid option: -"$OPTARG"" >&2
@@ -753,9 +757,12 @@ echo "Preparing outputs for upload in blob storage account $storageAccountName1 
 
 echo "----ARM Outputs----" >> consoleOutputs.txt
 
-echo "LICENSE IS !!!" >> consoleOutputs.txt
-echo $licenseField >> consoleOutputs.txt
 
+echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs
+echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs  
+echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs
+echo "P_PARAM is: $P_PARAM" | tee -a consoleOutputs
+  
 for key in ${constants}; do
  echo $key >> consoleOutputs.txt
 done
