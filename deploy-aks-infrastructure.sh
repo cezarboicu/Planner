@@ -756,12 +756,6 @@ rm ./credentials-velero
 echo "Preparing outputs for upload in blob storage account $storageAccountName1 / deploymentlogs"
 
 echo "----ARM Outputs----" >> consoleOutputs.txt
-
-
-echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs
-echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs  
-echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs
-echo "P_PARAM is: $P_PARAM" | tee -a consoleOutputs
   
 for key in ${constants}; do
  echo $key >> consoleOutputs.txt
@@ -781,6 +775,11 @@ then
 else
   echo "DB Creation is Disabled"  | tee -a consoleOutputs.txt
 fi
+
+echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs
+echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs  
+echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs
+echo "P_PARAM is: $P_PARAM" | tee -a consoleOutputs
 
 #Ingress Details
 echo "INGRESS_HOST is: $INGRESS_HOST" | tee -a consoleOutputs.txt
