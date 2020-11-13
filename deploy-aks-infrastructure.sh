@@ -784,6 +784,12 @@ else
   echo "DB Creation is Disabled"  | tee -a consoleOutputs.txt
 fi
 
+echo "G_PARAM is: $G_PARAM" | tee -a consoleOutputs.txt
+echo "K_PARAM is: $K_PARAM" | tee -a consoleOutputs.txt
+echo "D_PARAM is: $D_PARAM" | tee -a consoleOutputs.txt
+echo "C_PARAM is: $C_PARAM" | tee -a consoleOutputs.txt
+echo "S_PARAM is: $S_PARAM" | tee -a consoleOutputs.txt
+echo "p_PARAM is: $p_PARAM" | tee -a consoleOutputs.txt
 echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs.txt
 echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs.txt  
 echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs.txt
