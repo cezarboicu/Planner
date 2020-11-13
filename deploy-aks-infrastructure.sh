@@ -138,27 +138,33 @@ zonal_cluster=false
 
 while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do  
   case $opt in
-    g)  
+    g)
+      G_PARAM=$OPTARG
       echo "Worker Resource Group is $OPTARG"
       RESOURCEGROUP=$OPTARG
       ;; 
-    k)  
+    k)
+      K_PARAM=$OPTARG
       echo "AKS Cluster name is $OPTARG"
       AKSCLUSTERNAME=$OPTARG
       ;;  
     d)  
+      D_PARAM=$OPTARG
       echo "DNS Prefix is $OPTARG"  
       DNSNAME=$OPTARG
       ;;
     c)  
+      C_PARAM=$OPTARG
       echo "KOTS channel is $OPTARG"  
       KOTS_CHANNEL=$OPTARG
       ;;
     s)  
+      S_PARAM=$OPTARG
       #echo "SQL user $OPTARG"  
       SQL_USERNAME=$OPTARG
       ;;
     p)  
+      P_PARAM=$OPTARG
       #echo "SQL Password is $OPTARG"  
       SQL_PASSWORD=$OPTARG
       ;;
@@ -171,6 +177,7 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       fi
       ;;
     z)
+      Z_PARAM=$OPTARG
       echo "Zonal Cluster $OPTARG"
       zonal_cluster=$OPTARG
       ;;
@@ -187,6 +194,7 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       vnet_flag=true
       ;;  
     P)  
+      P_PARAM=$OPTARG
       echo "VNET Peering is enabled"  
       peering_flag=true
       P_PARAM="peer is enabled"
