@@ -262,35 +262,3 @@ location=$(az group show --name $RESOURCEGROUP | jq -r '.location')
 #  if [[ ! -n "$SQL_USERNAME" ]]; then echo "SQL UserName(-s option) has to be provided";exit 1; fi
 #fi
 
-#Current SignIn User
-sign_in_user=$(az ad signed-in-user show | jq -r '.mail')
-echo "Current signIn user: $sign_in_user" | tee -a consoleOutputs.txt
-
-echo "Permissions that exist on this Resource Group:" | tee -a consoleOutputs.txt
-#Console, single command distorts the output
-az role assignment list --resource-group $RESOURCEGROUP --out table
-#To File
-az role assignment list --resource-group $RESOURCEGROUP --out table >> consoleOutputs.txt
-
-#Set Subscription
-SUBSCRIPTION_ID=$(az group show --name $RESOURCEGROUP | jq -r '.id' | cut -d'/' -f3)
-az account set --subscription $SUBSCRIPTION_ID
-
-#cpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[0].nodeVmSize' $PARAMETERS_FILE)
-#gpu_instance_type=$(jq -r '.parameters.agentPoolProfiles.value[1].nodeVmSize' $PARAMETERS_FILE)
-
-if [ "${zonal_cluster}" = "true" ];
-then
-  cpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg cpu_instance_type "$cpu_instance_type" '.[] | select(.name==$cpu_instance_type and .locationInfo[0].zones[0] != null) | .name')
-  gpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg gpu_instance_type "$gpu_instance_type" '.[] | select(.name==$gpu_instance_type and .locationInfo[0].zones[0] != null) | .name')
-else
-  cpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg cpu_instance_type "$cpu_instance_type" '.[] | select(.name==$cpu_instance_type) | .name')
-  gpu_node_availability=$(az vm list-skus --location $location  | jq -r --arg gpu_instance_type "$gpu_instance_type" '.[] | select(.name==$gpu_instance_type) | .name')
-fi
-
-echo "you can run the below command to fetch list of instance types available in the current location"
-echo "az vm list-skus --location $location --output table"
-#Check for CPU and GPU Node availability under the location where resource group is created
-if [[ ! -n "$cpu_node_availability" ]]; then echo "CPU Node type: $cpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
-if [[ ! -n "$gpu_node_availability" ]]; then echo "GPU Node type: $gpu_instance_type that has been choosen is not enabled for your subscription for location $location";exit 1; fi
-
