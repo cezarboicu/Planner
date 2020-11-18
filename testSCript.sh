@@ -155,23 +155,18 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       KOTS_CHANNEL=$OPTARG
       ;;
     s)  
-      #echo "SQL user $OPTARG"  
+      echo "SQL user $OPTARG"  
       SQL_USERNAME=$OPTARG
       ;;
     p)  
-      #echo "SQL Password is $OPTARG"  
+      echo "SQL Password is $OPTARG"  
       SQL_PASSWORD=$OPTARG
       ;;
     e)
       echo "Expose Kots via Public IP/LoadBalancer is $OPTARG"
-      if [ $OPTARG = "Yes" ] ;
-        then      
-      	expose_kots=true;
-      fi
       ;;
     z)
       echo "Zonal Cluster $OPTARG"
-      zonal_cluster=$OPTARG
       ;;
     O)  
       echo "VNET Peering Target Resource Group is $OPTARG"  
