@@ -135,8 +135,9 @@ orchestrator_rg=false
 peering_flag=false
 expose_kots=false
 zonal_cluster=false
+database_type=single
 
-while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do  
+while getopts ":g:k:d:c:s:p:e:z:m:O:V:P" opt; do  
   case $opt in
     g)
       G_PARAM=$OPTARG
@@ -168,7 +169,7 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       #echo "SQL Password is $OPTARG"  
       SQL_PASSWORD=$OPTARG
       ;;
-    e)
+    x)
       E_PARAM=$OPTARG
       E_TEXT="ok!! - E"
       echo "Expose Kots via Public IP/LoadBalancer is $OPTARG" | tee -a consoleOutputs.txt
@@ -182,6 +183,10 @@ while getopts ":g:k:d:c:s:p:e:z:O:V:P" opt; do
       Z_PARAM=$OPTARG
       echo "Zonal Cluster $OPTARG"
       zonal_cluster=$OPTARG
+      ;;
+    m)
+      echo "Database type is $OPTARG"
+      database_type=$OPTARG
       ;;
     O)  
       O_TEXT="ok!! - O"
@@ -386,6 +391,20 @@ az aks nodepool add --name gpunodepool \
     --max-count 5
     --zones {1,2,3}
 fi; ##
+
+if [ "${db_creation_option}" = "new" ];
+then
+  if [ "${database_type}" = "single" ];
+  then
+    #If it's single database create users
+    sed "s/PASSWORD_VAR/${SQL_PASSWORD}/g" db-users.sql > db-users-temp.sql
+    sed -i "s/USERNAME_VAR/${SQL_USERNAME}/g" db-users-temp.sql
+    sed "s/USERNAME_VAR/${SQL_USERNAME}/g" db-schema.sql > db-schema-temp.sql
+    #Create schema and users
+    sqlcmd -S ${sqlhost} -U ${SQL_USERNAME} -P ${SQL_PASSWORD} -d master -i db-users-temp.sql
+    sqlcmd -S ${sqlhost} -U ${SQL_USERNAME} -P ${SQL_PASSWORD} -d aifabric -i db-schema-temp.sql
+  fi
+fi
 
 case $peering_flag in
     true )
