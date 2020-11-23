@@ -137,7 +137,7 @@ expose_kots=false
 zonal_cluster=false
 database_type=single
 
-while getopts ":g:k:d:c:s:p:e:z:m:O:V:P" opt; do  
+while getopts ":g:k:d:c:s:p:x:z:m:O:V:P" opt; do  
   case $opt in
     g)
       G_PARAM=$OPTARG
