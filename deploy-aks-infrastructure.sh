@@ -396,13 +396,10 @@ if [ "${db_creation_option}" = "new" ];
 then
   if [ "${database_type}" = "single" ];
   then
-    #If it's single database create users
-    sed "s/PASSWORD_VAR/${SQL_PASSWORD}/g" db-users.sql > db-users-temp.sql
-    sed -i "s/USERNAME_VAR/${SQL_USERNAME}/g" db-users-temp.sql
-    sed "s/USERNAME_VAR/${SQL_USERNAME}/g" db-schema.sql > db-schema-temp.sql
-    #Create schema and users
-    sqlcmd -S ${sqlhost} -U ${SQL_USERNAME} -P ${SQL_PASSWORD} -d master -i db-users-temp.sql
-    sqlcmd -S ${sqlhost} -U ${SQL_USERNAME} -P ${SQL_PASSWORD} -d aifabric -i db-schema-temp.sql
+    kubectl delete job create-db-schemas
+    helm upgrade --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml
+    sleep 10
+    kubectl logs $(kubectl get pods | grep create-db-schemas-nwpxg | cut -d ' ' -f1)
   fi
 fi
 
