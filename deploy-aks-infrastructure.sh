@@ -865,4 +865,4 @@ echo "Infrastructure Installation finished"
 end=`date +%s`
 runtime=$((end-start))
 hours=$((runtime / 3600)); minutes=$(( (runtime % 3600) / 60 )); seconds=$(( (runtime % 3600) % 60 )); 
-echo "Infrastructure Provisioning Runtime: $hours:$minutes:$seconds (hh:mm:ss)"
+echo "Infrastructure Provisioning Runtime: $hours:$minutes:$seconds (hh:mm:ss)" 
