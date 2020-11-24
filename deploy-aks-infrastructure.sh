@@ -723,6 +723,7 @@ sed -i "s/SQL_HOST_VAR/${sqlhost}/g" config-temp.yaml
 sed -i "s/SQL_USER_VAR/${SQL_USERNAME}/g" config-temp.yaml
 #Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
 sed -i "s#SQL_PASS_VAR#${SQL_PASSWORD}#g" config-temp.yaml
+sed -i "s#DATABASE_TYPE#${database_type}#g" config-temp.yaml
 
 ./kots install app "$KOTS_CHANNEL" --license-file ./licenseFile.yaml --config-values ./config-temp.yaml --shared-password $KOTSPW --namespace $NAMESPACE --port-forward=false
 
