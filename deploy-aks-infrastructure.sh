@@ -121,7 +121,7 @@ start=`date +%s`
 echo $@ >> consoleOutput.txt
 
 #download artifacts and unzip
-wget https://github.com/UiPath/ai-customer-scripts/raw/master/platform/aks/aks-arm.zip
+wget https://github.com/UiPath/ai-customer-scripts/blob/database_type_single/platform/aks/aks-arm.zip
 unzip aks-arm.zip
 cd aks-arm
 
@@ -140,38 +140,30 @@ database_type=single
 while getopts ":g:k:d:c:s:p:x:z:m:O:V:P" opt; do  
   case $opt in
     g)
-      G_PARAM=$OPTARG
       echo "Worker Resource Group is $OPTARG"
       RESOURCEGROUP=$OPTARG
       ;; 
     k)
-      K_PARAM=$OPTARG
       echo "AKS Cluster name is $OPTARG"
       AKSCLUSTERNAME=$OPTARG
       ;;  
     d)  
-      D_PARAM=$OPTARG
       echo "DNS Prefix is $OPTARG"  
       DNSNAME=$OPTARG
       ;;
     c)  
-      C_PARAM=$OPTARG
       echo "KOTS channel is $OPTARG"  
       KOTS_CHANNEL=$OPTARG
       ;;
     s)  
-      S_PARAM=$OPTARG
       #echo "SQL user $OPTARG"  
       SQL_USERNAME=$OPTARG
       ;;
     p)  
-      PASS_PARAM=$OPTARG
       #echo "SQL Password is $OPTARG"  
       SQL_PASSWORD=$OPTARG
       ;;
     x)
-      E_PARAM=$OPTARG
-      E_TEXT="ok!! - E"
       echo "Expose Kots via Public IP/LoadBalancer is $OPTARG" | tee -a consoleOutputs.txt
       if [[ "$OPTARG" == "yes" ]] ;
         then      
@@ -179,8 +171,6 @@ while getopts ":g:k:d:c:s:p:x:z:m:O:V:P" opt; do
       fi
       ;;
     z)
-      Z_TEXT="ok!!- Z"
-      Z_PARAM=$OPTARG
       echo "Zonal Cluster $OPTARG"
       zonal_cluster=$OPTARG
       ;;
@@ -189,22 +179,16 @@ while getopts ":g:k:d:c:s:p:x:z:m:O:V:P" opt; do
       database_type=$OPTARG
       ;;
     O)  
-      O_TEXT="ok!! - O"
-      O_PARAM=$OPTARG
       echo "VNET Peering Target Resource Group is $OPTARG"  
       ORCH_RG=$OPTARG
       orchestrator_rg=true
       ;; 
     V)  
-      V_TEXT="ok!! - V"
-      V_PARAM=$OPTARG
       echo "VNET Peering target name is $OPTARG"  
       ORCH_VNET=$OPTARG
       vnet_flag=true
       ;;  
     P)  
-      P_TEXT="ok!! - P"
-      P_PARAM=$OPTARG
       echo "VNET Peering is enabled"  
       peering_flag=true
       P_PARAM="peer is enabled"
@@ -805,21 +789,6 @@ then
 else
   echo "DB Creation is Disabled"  | tee -a consoleOutputs.txt
 fi
-
-echo "G_PARAM is: $G_PARAM" | tee -a consoleOutputs.txt
-echo "K_PARAM is: $K_PARAM" | tee -a consoleOutputs.txt
-echo "D_PARAM is: $D_PARAM" | tee -a consoleOutputs.txt
-echo "C_PARAM is: $C_PARAM" | tee -a consoleOutputs.txt
-echo "S_PARAM is: $S_PARAM" | tee -a consoleOutputs.txt
-echo "PASS_PARAM is: $PASS_PARAM" | tee -a consoleOutputs.txt
-echo "E_PARAM is: $E_PARAM" | tee -a consoleOutputs.txt
-echo "E_TEXT is: $E_TEXT" | tee -a consoleOutputs.txt
-echo "V_PARAM is: $V_PARAM" | tee -a consoleOutputs.txt  
-echo "V_TEXT is: $V_TEXT" | tee -a consoleOutputs.txt
-echo "O_PARAM is: $O_PARAM" | tee -a consoleOutputs.txt
-echo "O_TEXT is: $O_TEXT" | tee -a consoleOutputs.txt
-echo "P_PARAM is: $P_PARAM" | tee -a consoleOutputs.txt
-echo "P_TEXT is: $P_TEXT" | tee -a consoleOutputs.txt
 
 #Ingress Details
 echo "INGRESS_HOST is: $INGRESS_HOST" | tee -a consoleOutputs.txt
