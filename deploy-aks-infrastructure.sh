@@ -201,6 +201,12 @@ while getopts ":g:k:d:c:s:p:x:z:m:O:V:P" opt; do
   esac  
 done
 
+#install helm
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 
+chmod 700 get_helm.sh 
+./get_helm.sh
+
 #Defaulting namespace to aifabric
 NAMESPACE="aifabric"
 
@@ -381,7 +387,8 @@ then
   if [ "${database_type}" = "single" ];
   then
     kubectl delete job create-db-schemas
-    helm upgrade --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml
+    echo "helm upgrade --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml"
+    helm upgrade --debug --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml
     sleep 10
     kubectl logs $(kubectl get pods | grep create-db-schemas-nwpxg | cut -d ' ' -f1)
   fi
@@ -648,11 +655,6 @@ validateAndPrint "Not able to fetch ingress domain"
 if [[ ! -n $INGRESS_DOMAIN ]]; then echo "Error while fetching domain name, it might be a timing issue, Re-running the script should fix the same. Exiting !!";exit 1;  fi
 
 echo "Istio Setup successfully completed"
-
-#install helm 
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 
-chmod 700 get_helm.sh 
-./get_helm.sh
 
 # install Cert-Manager
 helm repo add jetstack https://charts.jetstack.io
