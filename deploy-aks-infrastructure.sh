@@ -121,7 +121,7 @@ start=`date +%s`
 echo $@ >> consoleOutput.txt
 
 #download artifacts and unzip
-wget https://github.com/UiPath/ai-customer-scripts/blob/database_type_single/platform/aks/aks-arm.zip
+wget https://github.com/UiPath/ai-customer-scripts/raw/database_type_single/platform/aks/aks-arm.zip
 unzip aks-arm.zip
 cd aks-arm
 
