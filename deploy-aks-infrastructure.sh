@@ -382,18 +382,6 @@ az aks nodepool add --name gpunodepool \
     --zones {1,2,3}
 fi; ##
 
-if [ "${db_creation_option}" = "new" ];
-then
-  if [ "${database_type}" = "single" ];
-  then
-    kubectl delete job create-db-schemas
-    echo "helm upgrade --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml"
-    helm upgrade --debug --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml
-    sleep 10
-    kubectl logs $(kubectl get pods | grep create-db-schemas-nwpxg | cut -d ' ' -f1)
-  fi
-fi
-
 case $peering_flag in
     true )
         # AiFabric VNET ID
@@ -446,6 +434,17 @@ validateAndPrint "istio-system namespace creation failed"
 createNamespace "cert-manager"
 validateAndPrint "cert-manager namespace creation failed"
 
+if [ "${db_creation_option}" = "new" ];
+then
+  if [ "${database_type}" = "single" ];
+  then
+    kubectl delete job create-db-schemas
+    echo "helm upgrade --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml"
+    helm upgrade --debug --force --wait --install mssql-db-tools mssql-db-tools --set dataSource.url.host=${sqlhost} --set dataSource.username=${SQL_USERNAME} --set dataSource.password=${SQL_PASSWORD} -f mssql-db-tools/values.yaml
+    sleep 10
+    kubectl logs $(kubectl get pods | grep create-db-schemas-nwpxg | cut -d ' ' -f1)
+  fi
+fi
 
 #taint
 #Tolerations has to be added to gpu deployments explicitly https://github.com/Azure/AKS/issues/1449
