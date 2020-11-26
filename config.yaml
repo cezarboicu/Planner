@@ -53,5 +53,6 @@ spec:
       default: aifabricuser
       value: SQL_USER_VAR
     dbtype.enable:
-      default: DATABASE_TYPE
+      default: single
+      value: DATABASE_TYPE
 status: {}
