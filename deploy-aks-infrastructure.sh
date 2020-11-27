@@ -639,7 +639,6 @@ validate grafana istio-system
 #Wait for the LB IP Allocation by underlying cloud provider
 sleep 45
 INGRESS_HOST=$(kubectl -n istio-system get svc istio-ingressgateway -o json | jq -r ".status.loadBalancer.ingress[0].ip")
-HOSTNAME=$(kubectl -n istio-system get svc istio-ingressgateway -o json | jq -r ".status.loadBalancer.ingress[0].hostname")
 
 #echo "http://$(kubectl describe service kotsadm --namespace $NAMESPACE | grep 'LoadBalancer Ingress' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'):3000"
 
@@ -704,7 +703,7 @@ sed "s/JWT_TOKEN_VAR/${jwtToken}/g" config.yaml > config-temp.yaml
 #Second edit onwards in-place edit 
 sed -i "s/IDENTITY_ENDPOINT_VAR/${identityEndpoint}/g" config-temp.yaml
 sed -i "s/ORCH_ENDPOINT_VAR/${orchestratorEndpoint}/g" config-temp.yaml
-sed -i "s/INGRESS_ENDPOINT_VAR/${HOSTNAME}/g" config-temp.yaml
+sed -i "s/INGRESS_ENDPOINT_VAR/${INGRESS_DOMAIN}/g" config-temp.yaml
 sed -i "s/SQL_HOST_VAR/${sqlhost}/g" config-temp.yaml
 sed -i "s/SQL_USER_VAR/${SQL_USERNAME}/g" config-temp.yaml
 #Using # as separator for sed, so passwords cant have hash, we have to sacrifice one character, i have chosen hash 
