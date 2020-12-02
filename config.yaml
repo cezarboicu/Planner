@@ -55,4 +55,7 @@ spec:
     dbtype.enable:
       default: single
       value: DATABASE_TYPE
+    platform.type:
+      default: azure
+      value: azure
 status: {}
